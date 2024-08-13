@@ -1,0 +1,19 @@
+kind: pipeline
+type: exec
+name: default
+
+steps:
+  - name: build
+    commands:
+      - docker stop django
+      - docker rm django
+      - cd /srv/
+      - rm -rf Helpdesk
+      - git clone git@github.com:user/project
+      - cd /srv/Helpdesk
+      - docker build -t project .
+      - docker run --restart always --name django -d -p 1234:1234 -t project
+
+when:
+  event:
+    push

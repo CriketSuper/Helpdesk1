@@ -1,0 +1,62 @@
+{% extends "layout/basic.html" %}
+
+{% block title %}Добавление заявки{% endblock %}
+
+{% block content %}
+<h2 class="ms-2">Добавление заявки</h2>
+<div class="container-fluid">
+    <form method="post" enctype="multipart/form-data">
+        <div class="mb-3">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div id="files-container"></div>
+            <button type="button" onclick="addFileField()">Добавить файл</button>
+            <p><br><input type="submit" value="Добавить заявку"></p>
+        </div>
+    </form>
+</div>
+
+<script>
+    function addFileField() {
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.name = 'documents';
+        fileInput.multiple = true;
+        fileInput.addEventListener('change', handleFileChange);
+
+        const fileNameInput = document.createElement('input');
+        fileNameInput.type = 'text';
+        fileNameInput.name = 'document_names';
+        fileNameInput.placeholder = 'Имя файла';
+        fileNameInput.addEventListener('input', handleFileNameChange);
+
+        const fileContainer = document.createElement('div');
+        fileContainer.classList.add('file-container');
+        fileContainer.appendChild(fileNameInput);
+        fileContainer.appendChild(fileInput);
+
+        const filesContainer = document.getElementById('files-container');
+        filesContainer.appendChild(fileContainer);
+    }
+
+    function handleFileChange(event) {
+        const fileInput = event.target;
+        const fileContainer = fileInput.parentNode;
+        const fileNameInput = fileContainer.querySelector('input[type="text"]');
+        fileNameInput.value = fileInput.files[0].name;
+    }
+
+    function handleFileNameChange(event) {
+        const fileNameInput = event.target;
+        const fileContainer = fileNameInput.parentNode;
+        const fileInput = fileContainer.querySelector('input[type="file"]');
+        const file = fileInput.files[0];
+        const newFile = new File([file], fileNameInput.value, { type: file.type });
+        fileInput.files[0] = newFile;
+    }
+
+    window.addEventListener('load', () => {
+        addFileField();
+    });
+</script>
+{% endblock %}
